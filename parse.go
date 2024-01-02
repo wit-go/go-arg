@@ -79,10 +79,28 @@ var ErrVersion = errors.New("version requested by user")
 // for monkey patching in example code
 var mustParseExit = os.Exit
 
+// This stores the args sent from modules
+var register []interface{}
+
+/*
+	Use this in your packages to register
+	variables with go-arg. Then add this to your init()
+
+	package 'foo'
+	function init() {
+		args.Register(&argsFoo)
+	}
+*/
+func Register(dest ...interface{}) {
+	register = append(register, dest...)
+}
+
 // MustParse processes command line arguments and exits upon failure
 func MustParse(dest ...interface{}) *Parser {
-	return mustParse(Config{Exit: mustParseExit}, dest...)
+	register = append(register, dest...)
+	return mustParse(Config{Exit: mustParseExit}, register...)
 }
+
 
 // mustParse is a helper that facilitates testing
 func mustParse(config Config, dest ...interface{}) *Parser {
